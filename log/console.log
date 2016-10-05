@@ -1,0 +1,12 @@
+2016-09-30 17:39:19.587 [error] <0.977.0> Supervisor 'Elixir.Logger.Supervisor' had child 'Elixir.Logger.ErrorHandler' started with 'Elixir.Logger.Watcher':watcher(error_logger, 'Elixir.Logger.ErrorHandler', {true,false,500}, link) at <0.982.0> exit with reason normal in context child_terminated
+2016-09-30 17:39:19.629 [info] <0.31.0> Application lager started on node nonode@nohost
+2016-09-30 17:39:19.631 [info] <0.31.0> Application jiffy started on node nonode@nohost
+2016-09-30 17:39:19.636 [info] <0.31.0> Application egithub started on node nonode@nohost
+2016-09-30 17:39:19.636 [info] <0.31.0> Application issuer started on node nonode@nohost
+2016-09-30 17:39:19.645 [info] <0.31.0> Application ex_unit started on node nonode@nohost
+2016-09-30 17:39:37.299 [error] <0.145.0> Supervisor 'Elixir.Logger.Supervisor' had child 'Elixir.Logger.ErrorHandler' started with 'Elixir.Logger.Watcher':watcher(error_logger, 'Elixir.Logger.ErrorHandler', {true,false,500}, link) at <0.150.0> exit with reason normal in context child_terminated
+2016-09-30 17:39:37.321 [info] <0.31.0> Application lager started on node nonode@nohost
+2016-09-30 17:39:37.323 [info] <0.31.0> Application jiffy started on node nonode@nohost
+2016-09-30 17:39:37.326 [info] <0.31.0> Application egithub started on node nonode@nohost
+2016-09-30 17:39:37.326 [info] <0.31.0> Application issuer started on node nonode@nohost
+2016-09-30 17:39:37.334 [info] <0.31.0> Application ex_unit started on node nonode@nohost
