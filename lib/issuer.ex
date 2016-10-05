@@ -1,5 +1,7 @@
 defmodule Issuer do
   @moduledoc """
+    https://groups.google.com/forum/?utm_medium=email&utm_source=footer#!msg/elixir-lang-core/MMB3ru8Rcxc/przYMxhZBAAJ
+    
   """
   def main(opts \\ []) do
     # opts = config |> Keyword.merge(opts)
@@ -7,12 +9,11 @@ defmodule Issuer do
     IO.puts "Hello, world!. Options: #{inspect(opts)}"
   end
 
-  def token do
-    Application.get_env(:issuer, :vcs)[:token] |> decrypt
-  end
-
   def vcs do
-    Application.get_env(:issuer, :vcs) || []
+    {_, data} = (Application.get_env(:issuer, :vcs) || [])
+                  |> Enum.into(%{})
+                  |> Map.get_and_update(:token, fn curr -> {curr, curr |> decrypt} end)
+    data
   end
 
   def setting(name) do

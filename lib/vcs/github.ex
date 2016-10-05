@@ -1,15 +1,18 @@
 defmodule Issuer.Github do
+  @client Tentacat.Client.new(%{access_token: Issuer.vcs[:token]})
+  @user   to_string(Issuer.vcs[:user])
+  @repo   to_string(Issuer.vcs[:repo])
+
   @moduledoc """
     1. Go to [`https://github.com/settings/tokens/new`](https://github.com/settings/tokens/new) and issue
        a new token to be used by your application.
   """
-  defstruct user:   Issuer.vcs[:user],
-            repo:   Issuer.vcs[:repo]
+  defstruct user:   @user,
+            repo:   @repo,
+            client: @client
 
-  @client Tentacat.Client.new(%{access_token: Issuer.vcs[:token]})
-
-  def keys(data) do
-    @client |> Tentacat.Users.Keys.list_mine
+  def keys do
+    Tentacat.Users.Keys.list(Issuer.vcs[:user], @client)
   end
 
   defimpl Issuer.Vcs, for: Issuer.Github do
@@ -23,7 +26,7 @@ defmodule Issuer.Github do
     end
 
     def tags(data) do
-      @client |> Tentacat.Repositories.Tags.list data.user, data.repo
+      Tentacat.Repositories.Tags.list data.user, data.repo, data.client
     end
 
     def push(data) do
