@@ -3,7 +3,7 @@ defmodule Issuer.Mixfile do
 
   def project do
     [app: :issuer,
-     version: "0.1.0",
+     version: File.read!(Path.join("config", "VERSION")),
      elixir: "~> 1.4-dev",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,

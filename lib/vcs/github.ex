@@ -26,7 +26,8 @@ defmodule Issuer.Github do
     end
 
     def tags(data) do
-      Tentacat.Repositories.Tags.list data.user, data.repo, data.client
+      Tentacat.Repositories.Tags.list(data.user, data.repo, data.client)
+        |> Enum.map(fn e -> e["name"] end)
     end
 
     def push(data) do
