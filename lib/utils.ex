@@ -39,7 +39,7 @@ defmodule Issuer.Utils do
   @version_file Path.join("config", "VERSION")
   @mix_file "mix.exs"
   @re ~r|version:\s*"([-.\w]+)"|
-  @proper_mix_version ~s|version: File.read!(#{@version_file})|
+  @proper_mix_version ~S|version: File.read!(Path.join("config", "VERSION"))|
 
   @doc """
   Returns “sprouts” for VCS tags. Those might be the the next version tag.
@@ -121,7 +121,14 @@ defmodule Issuer.Utils do
 
   ##############################################################################
 
-  def version_in_mix? do
+  def version_in_mix?(_ \\ false)
+  def version_in_mix?(false) do
+    case version_in_mix?(true) do
+      {_, :ok} -> false
+      response -> response
+    end
+  end
+  def version_in_mix?(true) do
     mix = File.read!(@mix_file)
     case Regex.scan(@re, mix, capture: :all_but_first) |> List.flatten do
       [version] when is_binary(version) -> {:yes, version}
@@ -138,7 +145,7 @@ defmodule Issuer.Utils do
 
   def version?(v \\ "0.0.1") do
     # version: "0.1.0" ⇒ version: File.read!("VERSION")
-    case version_in_mix?() do
+    case version_in_mix?(true) do
       {:yes, version} -> # found a version as is in mix :(
         File.write!(@version_file, version)
         File.write!(@mix_file, Regex.replace(@re, File.read!(@mix_file), @proper_mix_version))

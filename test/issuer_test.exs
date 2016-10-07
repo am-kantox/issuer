@@ -1,8 +1,7 @@
 defmodule Issuer.Test do
   use ExUnit.Case
-  doctest Issuer
 
   test "the truth" do
-    Mix.Tasks.Issuer.run ["Aleksie"]
+    # assert(true == false)
   end
 end
