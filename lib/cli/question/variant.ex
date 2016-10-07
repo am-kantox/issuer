@@ -1,5 +1,5 @@
 defmodule Issuer.CLI.Question.Variant do
-  @title "Please select one proper person:"
+  @title "Please select one variant:"
   @choices ["Bill Gates", "Linux Torvalds", "Steve Jobs"]
   @chosen -1
   @position 0

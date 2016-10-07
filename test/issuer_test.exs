@@ -1,4 +1,4 @@
-defmodule IssuerTest do
+defmodule Issuer.Test do
   use ExUnit.Case
   doctest Issuer
 

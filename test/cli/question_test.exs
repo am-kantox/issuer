@@ -1,34 +1,22 @@
-defmodule Issuer.CLI.Question.Variant.Test do
-  use ExUnit.Case
-  require Logger
-  import ExUnit.CaptureLog
-  doctest Issuer.CLI.Question.YesNo
+if System.get_env("ISSUER_INTERACTIVE_TEST") == "true" do
 
-  alias Issuer.CLI.IO.Ncurses
+  defmodule Issuer.CLI.Question.Test do
+    use ExUnit.Case
+    require Logger
+    import ExUnit.CaptureLog
+    doctest Issuer.CLI.Question.YesNo
 
-  test "ask for variant answer" do
-    q = %Issuer.CLI.Question.Variant{} |> Issuer.CLI.Question.to_question
-    questions = for i <- 1..10, do: q
-    Ncurses.survey! "Hello, please answer:", questions
-    # assert capture_log(fn ->
-    #   %Question.YesNo{title: "How do you do?"} |> Question.ask
-    # end) =~ "How do you do?"
+    alias Issuer.CLI.IO.Ncurses
+
+    test "ask for different answers" do
+      q = [
+        %Issuer.CLI.Question.Variant{} |> Issuer.CLI.Question.to_question,
+        %Issuer.CLI.Question.Variants{} |> Issuer.CLI.Question.to_question,
+        %Issuer.CLI.Question.Input{} |> Issuer.CLI.Question.to_question
+      ]
+      questions = (for i <- 1..2, do: q) |> Enum.flat_map(fn e -> e end) |> Enum.shuffle
+      Ncurses.survey! "Hello, please answer our survey:", questions
+    end
   end
 
-  test "ask for variants answer" do
-    q = %Issuer.CLI.Question.Variants{} |> Issuer.CLI.Question.to_question
-    questions = for i <- 1..10, do: q
-    Ncurses.survey! "Hello, please answer:", questions
-    # assert capture_log(fn ->
-    #   %Question.YesNo{title: "How do you do?"} |> Question.ask
-    # end) =~ "How do you do?"
-  end
-
-  test "ask for the answer to input" do
-    q = %Issuer.CLI.Question.Input{} |> Issuer.CLI.Question.to_question
-    Ncurses.survey! "Hello, please answer:", [q]
-    # assert capture_log(fn ->
-    #   %Question.YesNo{title: "How do you do?"} |> Question.ask
-    # end) =~ "How do you do?"
-  end
 end

@@ -1,5 +1,5 @@
 defmodule Issuer.CLI.Question.Input do
-  @title "Please select one proper person:"
+  @title "Please enter your variant:"
   @choices ""
   @chosen 0
   @position 0
