@@ -19,7 +19,7 @@ if System.get_env("ISSUER_INTERACTIVE_TEST") == "true" do
 #    end
 
     test "ask for repo details" do
-      Issuer.Github.encrypt_token
+      Issuer.Github.welcome_setup
     end
   end
 

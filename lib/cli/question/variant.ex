@@ -10,7 +10,7 @@ defmodule Issuer.CLI.Question.Variant do
             position: @position
 
   defimpl Issuer.CLI.Question, for: Issuer.CLI.Question.Variant do
-    def to_question(data, opts \\ []) do
+    def to_question(data, _opts \\ []) do
       { data.title, data.choices, data.choice, data.position }
     end
   end

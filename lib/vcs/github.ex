@@ -23,12 +23,12 @@ defmodule Issuer.Github do
     Asks the user for the token, suggest her to update `mix.exs` accordingly.
     https://github.com/settings/tokens
   """
-  def encrypt_token do
-    [user, repo] = user_repo
+  def welcome_setup do
+    [user, repo] = user_repo()
     home = System.get_env("HOME")
     prv  = if File.exists?(Path.join([home, ".ssh", "id_rsa"])), do: Path.join([home, ".ssh", "id_rsa"]), else: Path.join([home, ".ssh", "???"])
     pub  = if File.exists?(Path.join([home, ".ssh", "id_rsa.pub"])), do: Path.join([home, ".ssh", "id_rsa.pub"]), else: Path.join([home, ".ssh", "???"])
-    pem  = if File.exists?(Path.join([home, ".ssh", "id_rsa.pub.pem"])), do: Path.join([home, ".ssh", "id_rsa.pub.pem"]), else: "⚑ MISSING"
+    pem  = if File.exists?(Path.join([home, ".ssh", "id_rsa.pub.pem"])), do: Path.join([home, ".ssh", "id_rsa.pub.pem"]), else: "MISSING"
 
     notice = ~s"""
 
@@ -130,35 +130,24 @@ defmodule Issuer.Github do
     \e[32m=============================================================================================\e[0m
       \e[1;32mPut the code below into your `mix.exs` file, and run this task again:\e[0m
     \e[32m—————————————————————————————————————————————————————————————————————————————————————————————\e[0m
+
     #{mix_section}
     \e[32m=============================================================================================\e[0m
     """
   end
 
   defimpl Issuer.Vcs, for: Issuer.Github do
-    def diff(data, label \\ nil) do
-    end
-
-    def commit(data, message) do
-    end
-
-    def tag!(data, tag) do
-    end
-
     def tags(data) do
       Tentacat.Repositories.Tags.list(data.user, data.repo, data.client)
         |> Enum.map(fn e -> e["name"] end)
     end
-
-    def push(data) do
-    end
   end
 
   ##############################################################################
-  defp remote_repo_exists do
-    {_, status} = System.cmd("git", ~W|help|)
-    status == 0
-  end
+  # defp remote_repo_exists do
+  #   {_, status} = System.cmd("git", ~W|help|)
+  #   status == 0
+  # end
   defp user_repo do
     case System.cmd("git", ~W|remote show origin|) do
       {answer, 0} ->

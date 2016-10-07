@@ -39,7 +39,7 @@ defmodule Issuer.Utils do
   @version_file Path.join("config", "VERSION")
   @mix_file "mix.exs"
   @re ~r|version:\s*"([-.\w]+)"|
-  @proper_mix_version ~S|version: File.read!(Path.join("config", "VERSION"))|
+  @proper_mix_version ~s|version: File.read!(#{@version_file})|
 
   @doc """
   Returns “sprouts” for VCS tags. Those might be the the next version tag.
@@ -98,7 +98,7 @@ defmodule Issuer.Utils do
       ["v1.4.0-rc.1", "v1.3.3", "v0.15.1"]
   """
   def leaves([]) do
-    {_, version} = version?
+    {_, version} = version?()
     [version]
   end
   def leaves(tags) do
@@ -121,29 +121,41 @@ defmodule Issuer.Utils do
 
   ##############################################################################
 
-  defp version?(v \\ "0.0.1") do
+  def version_in_mix? do
     mix = File.read!(@mix_file)
-    # version: "0.1.0" ⇒ version: File.read!("VERSION")
     case Regex.scan(@re, mix, capture: :all_but_first) |> List.flatten do
-      [content] when is_binary(content) -> # found a version as is in mix :(
-        File.write!(@version_file, content)
-        File.write!(@mix_file, Regex.replace(@re, mix, @proper_mix_version))
-        {:mix!, content}
-      _ ->
-        case File.read(@version_file) do
-          {:error, :enoent} ->
-            File.write!(@version_file, v)
-            {:version!, v}
-          {:ok, content} -> {:ok, content |> String.trim}
-        end
+      [version] when is_binary(version) -> {:yes, version}
+      []                                -> {:no, :ok}
+      multi                             -> {:no, multi}
     end
   end
 
-  defp version!(v \\ "0.0.1") do
+  def version!(v \\ "0.0.1") do
     {status, _} = version?(v)
     File.write(@version_file, v)
     {status, v}
   end
+
+  def version?(v \\ "0.0.1") do
+    # version: "0.1.0" ⇒ version: File.read!("VERSION")
+    case version_in_mix?() do
+      {:yes, version} -> # found a version as is in mix :(
+        File.write!(@version_file, version)
+        File.write!(@mix_file, Regex.replace(@re, File.read!(@mix_file), @proper_mix_version))
+        {:mix!, version}
+      {:no, :ok} ->
+        case File.read(@version_file) do
+          {:error, :enoent} ->
+            File.write!(@version_file, v)
+            {:version!, v}
+          {:ok, version} -> {:ok, version |> String.trim}
+        end
+      {:no, _} ->
+        Mix.raise("Found many version strings in `mix`, aborting. Please revise manually.")
+    end
+  end
+
+  ##############################################################################
 
   # returns `["v", 0, 1, 3, "-dev"]`
   defp version(v) when is_binary(v) do

@@ -3,11 +3,6 @@ defmodule Issuer do
     https://groups.google.com/forum/?utm_medium=email&utm_source=footer#!msg/elixir-lang-core/MMB3ru8Rcxc/przYMxhZBAAJ
 
   """
-  def main(opts \\ []) do
-    # opts = config |> Keyword.merge(opts)
-    config = settings(opts)
-    IO.puts "Hello, world!. Options: #{inspect(opts)}"
-  end
 
   def vcs do
     {_, data} = (Application.get_env(:issuer, :vcs) || [])
@@ -16,21 +11,12 @@ defmodule Issuer do
     data
   end
 
-  def setting(name) do
-    settings[name]
-  end
-
   ##############################################################################
 
-  @settings [
-    version: ["config/README"]
-  ]
-
-  defp settings(opts \\ [], persist \\ true) do
-    cfg = @settings
-          |> Keyword.merge(Application.get_env(:issuer, :settings) || [])
-          |> Keyword.merge(opts)
-    if persist, do: Mix.Config.persist(issuer: [settings: cfg])
-    cfg
-  end
+  # defp settings(opts \\ [], persist \\ true) do
+  #   cfg = (Application.get_env(:issuer, :settings) || [])
+  #         |> Keyword.merge(opts)
+  #   if persist, do: Mix.Config.persist(issuer: [settings: cfg])
+  #   cfg
+  # end
 end

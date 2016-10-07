@@ -55,9 +55,9 @@ defmodule Issuer.CLI.IO.Ncurses do
       ExNcurses.keypad() # clear input
       ExNcurses.flushinp() # clear input
       case ExNcurses.getchar() do # FIXME support arrows, everything is prepared, see position
-        8   -> ask(row, {title, String.slice(choices, 0..len-2), 0, position - 1})
-        263 -> ask(row, {title, String.slice(choices, 0..len-2), 0, position - 1})
-        330 -> ask(row, {title, String.slice(choices, 0..len-2), 0, position - 1})
+        8   -> ask(row, {title, delete_last_grapheme(choices), 0, [position - 1, 0] |> Enum.max})
+        263 -> ask(row, {title, delete_last_grapheme(choices), 0, [position - 1, 0] |> Enum.max})
+        330 -> ask(row, {title, delete_last_grapheme(choices), 0, [position - 1, 0] |> Enum.max})
         10  ->
           if len > 0 do
             ask(row, {title, choices, 0, len}, true)
@@ -138,7 +138,7 @@ defmodule Issuer.CLI.IO.Ncurses do
 
   ##############################################################################
 
-  defp refresh(clear? \\ false) do
+  defp refresh(clear?) do
     ExNcurses.mvprintw(0, 0, "")
     ExNcurses.refresh()
     if clear?, do: ExNcurses.clear()
@@ -158,5 +158,10 @@ defmodule Issuer.CLI.IO.Ncurses do
 
   defp size(choices) when is_list(choices), do: Enum.count(choices)
   defp size(choices) when is_binary(choices), do: 1
+
+  defp delete_last_grapheme(string) do
+    len = String.length(string)
+    if len > 1, do: String.slice(string, 0..len-2), else: ""
+  end
 
 end
