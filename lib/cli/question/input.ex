@@ -1,17 +1,18 @@
 defmodule Issuer.CLI.Question.Input do
   @title "Please enter your variant:"
-  @choices ""
-  @chosen 0
-  @position 0
+  @suggestion ""
+  @chosen ""
+  @position -1
 
   defstruct title: @title,
-            choices: @choices,
+            suggestion: @suggestion,
             choice: @chosen,
             position: @position
 
   defimpl Issuer.CLI.Question, for: Issuer.CLI.Question.Input do
     def to_question(data, opts \\ []) do
-      { data.title, data.choices, data.choice, data.position }
+      position = if data.position >= 0, do: data.position, else: String.length(data.suggestion)
+      { data.title, data.suggestion, data.choice, position }
     end
   end
 end

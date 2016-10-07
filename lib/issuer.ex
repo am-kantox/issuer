@@ -23,7 +23,7 @@ defmodule Issuer do
   ##############################################################################
 
   @settings [
-    version: ["README"]
+    version: ["config/README"]
   ]
 
   defp settings(opts \\ [], persist \\ true) do
@@ -34,5 +34,3 @@ defmodule Issuer do
     cfg
   end
 end
-
-Issuer.main

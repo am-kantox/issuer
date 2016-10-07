@@ -7,17 +7,13 @@ defmodule Issuer.CLI.IO.Ncurses do
   @chosen_one_no "◎"
   @chosen_one_yes "🔘" # ● ◉ ⬤ 🔘
 
+  # FIXME Currently we have to pass the title that fits on the line
+  #        to properly render a caption, which is ugly.
+  #       Need to calculate it!
   def survey!(title, questions, row \\ 0) when is_list(questions) do
     ExNcurses.n_begin()
     refresh(false)
 
-    # results = questions |> Enum.map_reduce(%{}, fn {title, choices, chosen}, acc ->
-    #   row = acc[:row] || row + 2
-    #   answer = ask(row, {title, choices, chosen})
-    #   {_, acc} = acc |> Map.get_and_update(:row, fn curr -> {curr, (curr || row) + Enum.count(choices) + 1} end)
-    #   {_, acc} = acc |> Map.get_and_update(:answers, fn curr -> {curr, (curr || []) ++ [answer]} end)
-    #   acc
-    # end)
     IO.puts "\e[#{row};0H\e[#{@title_color};1m#{title}\e[0m\n"
     {results, _} = questions |> Enum.map_reduce(row + 3, fn {title, choices, chosen, position}, acc ->
       # FIXME store the whole screen text in the string array and print everything
@@ -32,7 +28,7 @@ defmodule Issuer.CLI.IO.Ncurses do
     ExNcurses.clear()
     ExNcurses.n_end()
 
-    IO.puts "\n\nDone!!\nWere chosen: [#{inspect(results)}]"
+    results
   end
 
   def ask(question) do
