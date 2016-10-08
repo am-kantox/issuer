@@ -35,7 +35,20 @@ defmodule Issuer.Git do
       Adds a tag to the repo.
     """
     def tag!(data, tag) do
+      case {System.cmd("git", ["tag", tag]), System.cmd("git", ["push", "--tags"])} do
+        {{"", 0}, {"", 0}}  -> :ok
+        other -> {:error, other}
+      end
+    end
 
+    @doc """
+      Commits to the repo.
+    """
+    def commit!(data, message) do
+      case System.cmd("git", ["commit", "-am", "message"]) do
+        {"", 0} -> :ok
+        other   -> {:error, other}
+      end
     end
   end
 

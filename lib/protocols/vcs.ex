@@ -15,7 +15,7 @@ defprotocol Issuer.Vcs do
   def tag!(data, tag)
 
   # @doc """
-  #   Performs a push to origin.
+  #   Performs commit.
   # """
-  # def push(data)
+  def commit!(data, message)
 end

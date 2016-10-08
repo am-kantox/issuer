@@ -24,8 +24,7 @@ defmodule Mix.Tasks.Issuer do
   end
 
   defp everything!(argv) do
-#    [:tests!, :status!, :version!]
-    [:version!]
+    [:tests!, :commit!, :status!]
       |> Enum.all?(fn f -> apply(Mix.Tasks.Issuer, f, [argv]) end)
   end
 
@@ -51,30 +50,32 @@ defmodule Mix.Tasks.Issuer do
     step("git status", fun, callback, argv)
   end
 
-  def version!(argv) do
+  def commit!(argv) do
     # FIXME NOT HARDCODE GIT
     fun = fn _ ->
       tags = %Issuer.Git{}
                |> Issuer.Vcs.tags
                |> Enum.filter(&Issuer.Utils.version_valid?/1)
-               |> Issuer.Utils.leaves
+               |> Issuer.Utils.sprouts
       questions = [
         %Issuer.CLI.Question.Variant{
           title: "Please select a version you want to bump to",
           choices: tags,
           choice: 0,
         } |> Issuer.CLI.Question.to_question,
+        %Issuer.CLI.Question.Input{
+          title: "Please specify a commit message",
+          suggestion: "Bump version."
+        } |> Issuer.CLI.Question.to_question,
       ]
-      answer = CLI.survey! "I need some more information.", questions
-      IO.inspect answer
+      [index, message] = CLI.survey! "I need some more information.", questions
+      version = tags |> Enum.at(index)
+      Issuer.Utils.version!(version)
+      %Issuer.Git{} |> Issuer.Vcs.commit!(message)
+      %Issuer.Git{} |> Issuer.Vcs.tag!(version |> Issuer.Utils.prefix_version)
     end
-    callback = fn result ->
-      case result do
-        # {:changes, files} -> ["Unstaged changes:\n", files |> String.trim_trailing]
-        other -> ["Unknown error: ", inspect(other)]
-      end
-    end
-    step("analyzing tags", fun, callback, argv)
+    callback = fn result -> ["Unknown error: ", inspect(result)] end
+    step("committing changes", fun, callback, argv)
   end
 
   ##############################################################################

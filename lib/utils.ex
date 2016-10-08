@@ -9,10 +9,10 @@ defmodule Issuer.Utils do
   Returns “sprouts” for VCS tags. Those might be the the next version tag.
 
       iex> ["0.0.1"] |> Issuer.Utils.sprouts
-      ["1.0.0-rc.1", "1.0.0-dev", "1.0.0", "0.1.0-rc.1", "0.1.0-dev", "0.1.0", "0.0.2"]
+      ["0.0.2", "0.1.0", "0.1.0-dev", "0.1.0-rc.1", "1.0.0", "1.0.0-dev", "1.0.0-rc.1"]
 
       iex> ["0.1.1-rc2"] |> Issuer.Utils.sprouts
-      ["0.1.1-rc3", "0.1.1"]
+      ["0.1.1", "0.1.1-rc3"]
 
       iex> tags = ["v1.4.0-rc.1", "v1.4.0-dev",
       ...> "v1.3.3", "v1.3.2", "v1.3.1", "v1.3.0", "v1.3.0-rc.1", "v1.3.0-rc.0", "v1.2.6",
@@ -24,14 +24,14 @@ defmodule Issuer.Utils do
       ...> "v0.11.2", "v0.11.1", "v0.11.0", "v0.10.3", "v0.10.2", "v0.10.1", "v0.10.0",
       ...> "v0.9.3"]
       ...> tags |> Issuer.Utils.sprouts
-      ["v2.0.0", "v1.4.0-rc.2", "v1.4.0", "v1.3.4", "v1.0.0", "v0.16.0", "v0.15.2"]
+      ["v1.4.0", "v1.4.0-rc.2", "v1.3.4", "v2.0.0", "v0.15.2", "v0.16.0", "v1.0.0"]
   """
   def sprouts(tags) when is_list(tags) do
     [head | tail] = tags |> leaves |> Enum.map(&sprouts/1)
     [head | tail |> Enum.map(fn e -> e |> Enum.reject(&suffixed?/1) end)]
       |> List.flatten
       |> Enum.uniq
-      |> Enum.sort(&(&1 > &2)) # FIXME Maybe more appropriate sorting?
+#      |> Enum.sort(&(&1 > &2)) # FIXME appropriate sorting?
   end
   def sprouts(tags) when is_binary(tags) do
     tags |> version |> smart_sprouts
@@ -89,8 +89,8 @@ defmodule Issuer.Utils do
     case version_valid?(v) do
       false -> {:invalid, v}
       version ->
-        [_prefix | v] = version
-        File.write(@version_file, version(["" | v]))
+        uv = version |> unprefix_version
+        File.write(@version_file, uv)
         {:ok, version}
     end
   end
@@ -112,6 +112,23 @@ defmodule Issuer.Utils do
       {:no, _} ->
         Mix.raise("Found many version strings in `mix`, aborting. Please revise manually.")
     end
+  end
+
+  def prefix_version(v) when is_binary(v) do
+    prefix_version(version(v))
+  end
+  def prefix_version(["", h, m, s, suffix]) do
+    version(["v", h, m, s, suffix])
+  end
+  def prefix_version([prefix, h, m, s, suffix]) do
+    version([prefix, h, m, s, suffix])
+  end
+
+  def unprefix_version(v) when is_binary(v) do
+    unprefix_version(version(v))
+  end
+  def unprefix_version([_prefix | tail]) do
+    version(["" | tail])
   end
 
   def version_valid?(v) do
