@@ -24,7 +24,7 @@ defmodule Mix.Tasks.Issuer do
   end
 
   defp everything!(argv) do
-    [:tests!, :commit!, :status!]
+    [:tests!, :commit!, :status!, :hex!]
       |> Enum.all?(fn f -> apply(Mix.Tasks.Issuer, f, [argv]) end)
   end
 
@@ -76,6 +76,10 @@ defmodule Mix.Tasks.Issuer do
     end
     callback = fn result -> ["Unknown error: ", inspect(result)] end
     step("committing changes", fun, callback, argv)
+  end
+
+  def hex!(argv) do
+    Mix.Tasks.Hex.Publish.run(argv)
   end
 
   ##############################################################################
