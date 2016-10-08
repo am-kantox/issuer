@@ -31,11 +31,6 @@ defmodule Issuer.CLI.IO.Ncurses do
     results
   end
 
-  def ask(question) do
-    question |> IO.ANSI.format
-
-  end
-
   ##############################################################################
 
   defp ask(row, questionnaire, final \\ false)

@@ -5,18 +5,24 @@ defmodule Mix.Tasks.Issuer.Version do
   @moduledoc @shortdoc
 
   @doc false
-  def run(_) do
-    case Issuer.Utils.version? do
-      {:version!, version} ->
-        IO.puts "​⚑ Misconfiguration detected: version was not found. `VERSION` file was written."
-        version
-      {:mix!, version} ->
-        IO.puts "⚐ Version updated in both `mix.exs` and `VERSION` files"
-        version
-      {:ok, version} -> version
+  def run(opts \\ []) do
+    case opts do
+      [] -> case Issuer.Utils.version? do
+              {:version!, version} ->
+                flagged(true,  "Misconfiguration detected: version was not found. `VERSION` file was written.")
+                version
+              {:mix!, version} ->
+                flagged(false, "Version updated in both `mix.exs` and `VERSION` files")
+                version
+              {:ok, version} -> version
+            end
+            :ok
+      [version] when is_binary(version) ->
+
     end
-    :ok
   end
+
+  ##############################################################################
 
   @notice ~s"""
 
@@ -45,5 +51,9 @@ defmodule Mix.Tasks.Issuer.Version do
   defp notice do
     IO.puts notice
     IO.gets "Press <Enter> to continue, or <Ctrl>+<C> to abort..."
+  end
+
+  defp flagged(bold, text) do
+    Bunt.puts [:bright, :red, (if bold, do: "​⚑", else: "⚐"), :reset, " ", text]
   end
 end

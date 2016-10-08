@@ -8,7 +8,7 @@ defmodule Mix.Tasks.Issuer do
   def run(argv) do
     case prerequisites?() do
       {:fail, :version} -> Mix.Tasks.Issuer.Version.run(argv)
-      :ok               -> run_everything(argv)
+      :ok               -> everything!(argv)
     end
 
   end
@@ -22,36 +22,55 @@ defmodule Mix.Tasks.Issuer do
     end
   end
 
-  defp run_everything(argv) do
-    run_tests(argv)
+  defp everything!(argv) do
+    [:tests!, :status!]
+      |> Enum.all?(fn f -> apply(Mix.Tasks.Issuer, f, [argv]) end)
   end
 
-  defp run_tests(argv) do
+  def tests!(argv) do
+    fun = fn argv -> Mix.Tasks.Test.run(argv) end
+    callback = fn result -> "Failed tests count: #{result |> Enum.count}." end
+
     mix_env = Mix.env
     Mix.env(:test)
-    step("tests", fn argv -> Mix.Tasks.Test.run(argv) end, argv)
+    step("tests", fun, callback, argv)
     Mix.env(mix_env)
+  end
+
+  def status!(argv) do
+    fun = fn _ -> %Issuer.Github{} |> Issuer.Vcs.status end
+    callback = fn result ->
+      case result do
+        {:error, {files, 0}} -> files |> String.trim_trailing
+        other -> ["Unknown error: ", inspect(other)]
+      end
+    end
+    step("git status", fun, callback, argv)
   end
 
   ##############################################################################
 
   @delim "———————————————————————————————————————————————————————————————————————————"
   @super "==========================================================================="
-  defp step(title, fun, opts \\ [])do
+  defp step(title, fun, callback \\ nil, opts \\ [])do
+    IO.puts ""
     IO.puts @super
-    Bunt.puts [:bright, "⇒", :reset, " Running “", :bright, title, :reset, "”..."]
+    Bunt.puts [:bright, "⇒", :reset, " Running “", :bright, title, :reset, "”…"]
     IO.puts @delim
 
     result = fun.(opts)
 
-    IO.puts @delim
     case result do
-      :ok   -> Bunt.puts([:green, :bright, "✓", :reset, " “", :bright, title, :reset, "” ", :green, "succeeded."])
+      :ok   ->
+        Bunt.puts([:green, :bright, "✓", :reset, " “", :bright, title, :reset, "” ", :green, "succeeded."])
+        IO.puts @super
+        true
       fails ->
-        Bunt.puts([:red, :bright, "✗", :reset, " “", :bright, title, :reset, "” ", :red, "failed.", :reset, " Returned:"])
-        IO.puts @delim
-        Bunt.puts([:yellow, inspect(fails)])
+        message = [:red, :bright, "✗", :reset, " “", :bright, title, :reset, "” ", :red, "failed.", :reset]
+        addendum = if callback, do: [" Details:\n", @delim, "\n", :yellow, callback.(fails)], else: []
+        Bunt.puts(message ++ addendum)
+        IO.puts @super
+        false
     end
-    IO.puts @super
   end
 end

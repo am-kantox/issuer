@@ -85,26 +85,14 @@ defmodule Issuer.Utils do
 
   ##############################################################################
 
-  def version_in_mix?(_ \\ false)
-  def version_in_mix?(false) do
-    case version_in_mix?(true) do
-      {_, :ok} -> false
-      response -> response
-    end
-  end
-  def version_in_mix?(true) do
-    mix = File.read!(@mix_file)
-    case Regex.scan(@re, mix, capture: :all_but_first) |> List.flatten do
-      [version] when is_binary(version) -> {:yes, version}
-      []                                -> {:no, :ok}
-      multi                             -> {:no, multi}
-    end
-  end
-
   def version!(v \\ "0.0.1") do
-    {status, _} = version?(v)
-    File.write(@version_file, v)
-    {status, v}
+    if version_valid?(v) do
+      {status, _} = version?(v)
+      File.write(@version_file, v)
+      {status, v}
+    else
+      {:invalid, v}
+    end
   end
 
   def version?(v \\ "0.0.1") do
@@ -123,6 +111,30 @@ defmodule Issuer.Utils do
         end
       {:no, _} ->
         Mix.raise("Found many version strings in `mix`, aborting. Please revise manually.")
+    end
+  end
+
+  def version_valid?(v) do
+    try do
+      version(v)
+    rescue
+      MatchError -> false
+    end
+  end
+
+  def version_in_mix?(_ \\ false)
+  def version_in_mix?(false) do
+    case version_in_mix?(true) do
+      {_, :ok} -> false
+      response -> response
+    end
+  end
+  def version_in_mix?(true) do
+    mix = File.read!(@mix_file)
+    case Regex.scan(@re, mix, capture: :all_but_first) |> List.flatten do
+      [version] when is_binary(version) -> {:yes, version}
+      []                                -> {:no, :ok}
+      multi                             -> {:no, multi}
     end
   end
 
