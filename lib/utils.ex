@@ -85,13 +85,13 @@ defmodule Issuer.Utils do
 
   ##############################################################################
 
-  def version!(v \\ "0.0.1") do
-    if version_valid?(v) do
-      {status, _} = version?(v)
-      File.write(@version_file, v)
-      {status, v}
-    else
-      {:invalid, v}
+  def version!(v) when is_binary(v) do
+    case version_valid?(v) do
+      false -> {:invalid, v}
+      version ->
+        [_prefix | v] = version
+        File.write(@version_file, version(["" | v]))
+        {:ok, version}
     end
   end
 

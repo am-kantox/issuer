@@ -1,8 +1,9 @@
 defmodule Mix.Tasks.Issuer do
-  use Mix.Task
-
   @shortdoc  "Issues the package to hex.pm" # (use `--help` for options)" BAH not yet
   @moduledoc @shortdoc
+
+  use Mix.Task
+  alias Issuer.CLI.IO.Ncurses, as: CLI
 
   @doc false
   def run(argv) do
@@ -23,7 +24,8 @@ defmodule Mix.Tasks.Issuer do
   end
 
   defp everything!(argv) do
-    [:tests!, :status!]
+#    [:tests!, :status!, :version!]
+    [:version!]
       |> Enum.all?(fn f -> apply(Mix.Tasks.Issuer, f, [argv]) end)
   end
 
@@ -38,7 +40,8 @@ defmodule Mix.Tasks.Issuer do
   end
 
   def status!(argv) do
-    fun = fn _ -> %Issuer.Github{} |> Issuer.Vcs.status end
+    # FIXME NOT HARDCODE GIT
+    fun = fn _ -> %Issuer.Git{} |> Issuer.Vcs.status end
     callback = fn result ->
       case result do
         {:changes, files} -> ["Unstaged changes:\n", files |> String.trim_trailing]
@@ -46,6 +49,32 @@ defmodule Mix.Tasks.Issuer do
       end
     end
     step("git status", fun, callback, argv)
+  end
+
+  def version!(argv) do
+    # FIXME NOT HARDCODE GIT
+    fun = fn _ ->
+      tags = %Issuer.Git{}
+               |> Issuer.Vcs.tags
+               |> Enum.filter(&Issuer.Utils.version_valid?/1)
+               |> Issuer.Utils.leaves
+      questions = [
+        %Issuer.CLI.Question.Variant{
+          title: "Please select a version you want to bump to",
+          choices: tags,
+          choice: 0,
+        } |> Issuer.CLI.Question.to_question,
+      ]
+      answer = CLI.survey! "I need some more information.", questions
+      IO.inspect answer
+    end
+    callback = fn result ->
+      case result do
+        # {:changes, files} -> ["Unstaged changes:\n", files |> String.trim_trailing]
+        other -> ["Unknown error: ", inspect(other)]
+      end
+    end
+    step("analyzing tags", fun, callback, argv)
   end
 
   ##############################################################################

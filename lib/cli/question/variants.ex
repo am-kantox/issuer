@@ -1,6 +1,6 @@
 defmodule Issuer.CLI.Question.Variants do
   @title "Please select one or many variants:"
-  @choices ["Bill Gates", "Linux Torvalds", "Steve Jobs"]
+  @choices ["Bill Gates", "Linux Torvalds", "Steve Jobs", "Sergey Brin", "Arkady Volozh"]
   @chosen [1, 2]
   @position 0
 

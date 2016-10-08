@@ -75,8 +75,7 @@ defmodule Issuer.CLI.IO.Ncurses do
     end)
 
     choice_count = Enum.count(choices)
-    upwards = row + 2 - choice_count + position + 1
-    IO.puts "\e[#{upwards};0H"
+    IO.puts "\e[#{row + position};4H"
 
     unless final do
       ExNcurses.keypad() # clear input
@@ -111,8 +110,7 @@ defmodule Issuer.CLI.IO.Ncurses do
     end)
 
     choice_count = Enum.count(choices)
-    upwards = row + 2 - choice_count + position + 1
-    IO.puts "\e[#{upwards};0H"
+    IO.puts "\e[#{row + position};4H"
 
     unless final do
       ExNcurses.keypad() # clear input

@@ -1,4 +1,4 @@
-defmodule Issuer.Github do
+defmodule Issuer.Git do
   alias Issuer.CLI.IO.Ncurses, as: CLI
   alias Issuer.CLI.Question
   alias Issuer.CLI.Question.Input
@@ -8,7 +8,7 @@ defmodule Issuer.Github do
 
   defstruct status: nil
 
-  defimpl Issuer.Vcs, for: Issuer.Github do
+  defimpl Issuer.Vcs, for: Issuer.Git do
     @doc """
       Lists tags for the repository given.
     """
