@@ -25,9 +25,9 @@ defmodule Issuer.Github do
     """
     def status(data) do
       case System.cmd("git", ["status", "--short"]) do
-        {0, ""}  -> :ok
-        {0, msg} -> {:changes, msg}
-        {e, msg} -> {:error, {e, msg}}
+        {"", 0}  -> :ok
+        {msg, 0} -> {:changes, msg}
+        {msg, e} -> {:error, {e, msg}}
       end
     end
 

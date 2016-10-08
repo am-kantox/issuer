@@ -41,7 +41,7 @@ defmodule Mix.Tasks.Issuer do
     fun = fn _ -> %Issuer.Github{} |> Issuer.Vcs.status end
     callback = fn result ->
       case result do
-        {:error, {files, 0}} -> files |> String.trim_trailing
+        {:changes, files} -> ["Unstaged changes:\n", files |> String.trim_trailing]
         other -> ["Unknown error: ", inspect(other)]
       end
     end
