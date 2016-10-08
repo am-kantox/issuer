@@ -4,7 +4,7 @@ defmodule Issuer.Mixfile do
   def project do
     [app: :issuer,
      version: File.read!(Path.join("config", "VERSION")),
-     elixir: "~> 1.4-dev",
+     elixir: "~> 1.3.2",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      description: description(),
@@ -16,7 +16,7 @@ defmodule Issuer.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :tentacat, :bunt, :ex_ncurses]]
+    [applications: [:logger, :bunt, :ex_ncurses]]
   end
 
   #   {:mydep, "~> 0.3.0"}
@@ -25,7 +25,6 @@ defmodule Issuer.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:tentacat, "~> 0.5"},
       {:bunt, "~> 0.1"},
       {:inch_ex, "~> 0.0"},
       {:ex_ncurses, git: "https://github.com/jfreeze/ex_ncurses.git"},

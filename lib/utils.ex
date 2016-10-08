@@ -1,41 +1,5 @@
 defmodule Issuer.Utils do
 
-  ##############################################################################
-
-  @doc """
-  RSA-encrypts the text given. See
-  [Encryption with RSA Key Pairs](http://krisjordan.com/essays/encrypting-with-rsa-key-pairs)
-  for details. [More howtos](https://gist.github.com/colinstein/de1755d2d7fbe27a0f1e).
-  Accepts binary as an input.
-
-      iex> "Hello, world!" |> Issuer.Utils.encrypt |> Issuer.Utils.decrypt
-      "Hello, world!"
-  """
-  def encrypt(text) do
-    [identity] = Application.get_env(:issuer, :identity)[:pem]
-                   |> File.read!
-                   |> :public_key.pem_decode
-    text
-      |> :public_key.encrypt_public(identity |> :public_key.pem_entry_decode)
-      |> :base64.encode_to_string
-  end
-
-  @doc """
-  RSA-decrypts the text given. See
-  [Encryption with RSA Key Pairs](http://krisjordan.com/essays/encrypting-with-rsa-key-pairs)
-  for details. Accepts charlist as an input.
-  """
-  def decrypt(text) do
-    [identity] = Application.get_env(:issuer, :identity)[:prv]
-                   |> File.read!
-                   |> :public_key.pem_decode
-    text
-      |> :base64.decode
-      |> :public_key.decrypt_private(identity |> :public_key.pem_entry_decode)
-  end
-
-  ##############################################################################
-
   @version_file Path.join("config", "VERSION")
   @mix_file "mix.exs"
   @re ~r|version:\s*"([-.\w]+)"|

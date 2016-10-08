@@ -8,7 +8,6 @@ defmodule Mix.Tasks.Issuer do
   def run(argv) do
     case prerequisites?() do
       {:fail, :version} -> Mix.Tasks.Issuer.Version.run(argv)
-      {:fail, :env}     -> Mix.Tasks.Issuer.Init.run(argv)
       :ok               -> run_everything(argv)
     end
 
@@ -28,23 +27,31 @@ defmodule Mix.Tasks.Issuer do
   end
 
   defp run_tests(argv) do
-    IO.puts ~S"""
-    ===========================================================================
-    Running tests...
-    ———————————————————————————————————————————————————————————————————————————
-    """
     mix_env = Mix.env
     Mix.env(:test)
-    result = Mix.Tasks.Test.run(argv)
-
-    IO.puts "———————————————————————————————————————————————————————————————————————————"
-    case result do
-      :ok   -> Bunt.puts([:green, "✓ tests succeeded"])
-      fails -> Bunt.puts([:red, "✗ #{fails |> Enum.count} tests failed"])
-    end
+    step("tests", fn argv -> Mix.Tasks.Test.run(argv) end, argv)
     Mix.env(mix_env)
-    IO.puts ~S"""
-    ===========================================================================
-    """
+  end
+
+  ##############################################################################
+
+  @delim "———————————————————————————————————————————————————————————————————————————"
+  @super "==========================================================================="
+  defp step(title, fun, opts \\ [])do
+    IO.puts @super
+    Bunt.puts [:bright, "⇒", :reset, " Running “", :bright, title, :reset, "”..."]
+    IO.puts @delim
+
+    result = fun.(opts)
+
+    IO.puts @delim
+    case result do
+      :ok   -> Bunt.puts([:green, :bright, "✓", :reset, " “", :bright, title, :reset, "” ", :green, "succeeded."])
+      fails ->
+        Bunt.puts([:red, :bright, "✗", :reset, " “", :bright, title, :reset, "” ", :red, "failed.", :reset, " Returned:"])
+        IO.puts @delim
+        Bunt.puts([:yellow, inspect(fails)])
+    end
+    IO.puts @super
   end
 end

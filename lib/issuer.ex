@@ -4,13 +4,6 @@ defmodule Issuer do
 
   """
 
-  def vcs do
-    {_, data} = (Application.get_env(:issuer, :vcs) || [])
-                  |> Enum.into(%{})
-                  |> Map.get_and_update(:token, fn curr -> {curr, curr |> Issuer.Utils.decrypt} end)
-    data
-  end
-
   ##############################################################################
 
   # defp settings(opts \\ [], persist \\ true) do
