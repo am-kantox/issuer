@@ -24,7 +24,7 @@ defmodule Mix.Tasks.Issuer do
   end
 
   defp everything!(argv) do
-    [:tests!, :commit!, :status!, :hex!]
+    [:tests!, :readme!, :commit!, :status!, :hex!]
       |> Enum.all?(fn f -> apply(Mix.Tasks.Issuer, f, [argv]) end)
   end
 
@@ -36,6 +36,25 @@ defmodule Mix.Tasks.Issuer do
     Mix.env(:test)
     step("tests", fun, callback, argv)
     Mix.env(mix_env)
+  end
+
+  def readme!(argv) do
+    fun = fn argv ->
+      case Issuer.Utils.version? do
+        {:ok, version} ->
+          # [{:issuer, "~> 0.1.0"}]
+          File.write!("README.md", Regex.replace(
+            ~r|{\s*#{inspect(Mix.Project.config[:app])},\s*"~>[^"]+"}|,
+            File.read!("README.md"),
+            ~s|{#{inspect(Mix.Project.config[:app])}, "~> #{version}"}|
+          ))
+          :ok
+        other -> ["Fail to update README: ", inspect(other)]
+      end
+    end
+    callback = fn result -> "Failed tests count: #{result |> Enum.count}." end
+
+    step("README", fun, callback, argv)
   end
 
   def status!(argv) do

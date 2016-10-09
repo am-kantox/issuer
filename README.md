@@ -10,7 +10,7 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 
     ```elixir
     def deps do
-      [{:issuer, "~> 0.1.0"}]
+      [{:issuer, "~> 0.0.20"}]
     end
     ```
 

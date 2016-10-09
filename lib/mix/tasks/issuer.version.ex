@@ -18,7 +18,8 @@ defmodule Mix.Tasks.Issuer.Version do
             end
             :ok
       [version] when is_binary(version) ->
-
+        {_, version} = Issuer.Utils.version?(version)
+        Issuer.Utils.version!(version)
     end
   end
 
