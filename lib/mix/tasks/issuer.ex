@@ -79,7 +79,10 @@ defmodule Mix.Tasks.Issuer do
   end
 
   def hex!(argv) do
-    Mix.Tasks.Hex.Publish.run(argv)
+    fun = fn argv -> Mix.Tasks.Hex.Publish.run(argv) end
+    callback = fn result -> "Got an error from Hex: #{inspect(result)}." end
+
+    step("publishing to hex", fun, callback, argv)
   end
 
   ##############################################################################
