@@ -20,7 +20,7 @@ defmodule Issuer.Mixfile do
   end
 
   def version do
-    File.read!(Path.join("config", "VERSION")) 
+    File.read!(Path.join("config", "VERSION"))
   end
 
   #   {:mydep, "~> 0.3.0"}
@@ -30,10 +30,10 @@ defmodule Issuer.Mixfile do
   defp deps do
     [
       {:bunt, "~> 0.1"},
-      {:inch_ex, "~> 0.0"},
       {:ex_ncurses, git: "https://github.com/jfreeze/ex_ncurses.git", only: :dev},
 
       {:credo, "~> 0.4", only: [:dev, :test]},
+      {:inch_ex, "~> 0.0", only: :dev},
       {:ex_doc, "~> 0.11", only: :dev}
     ]
   end
