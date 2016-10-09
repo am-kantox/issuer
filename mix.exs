@@ -3,7 +3,7 @@ defmodule Issuer.Mixfile do
 
   def project do
     [app: :issuer,
-     version: File.read!(Path.join("config", "VERSION")),
+     version: version(),
      elixir: "~> 1.3.2",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
@@ -17,6 +17,10 @@ defmodule Issuer.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     [applications: [:logger, :bunt]]
+  end
+
+  def version do
+    File.read!(Path.join("config", "VERSION")) 
   end
 
   #   {:mydep, "~> 0.3.0"}
