@@ -32,8 +32,8 @@ defmodule Issuer.Mixfile do
       {:bunt, "~> 0.1"},
       {:ex_ncurses, git: "https://github.com/jfreeze/ex_ncurses.git", only: :dev},
 
-      {:credo, "~> 0.4", only: [:dev, :test]},
-      {:inch_ex, "~> 0.0", only: :dev},
+      {:credo, "~> 0.4", only: [:dev]},
+      {:inch_ex, "~> 0.0", only: :dev, optional: true},
       {:ex_doc, "~> 0.11", only: :dev}
     ]
   end
