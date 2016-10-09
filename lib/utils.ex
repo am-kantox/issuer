@@ -91,6 +91,12 @@ defmodule Issuer.Utils do
       version ->
         uv = version |> unprefix_version
         File.write(@version_file, uv)
+
+        # ⇓ FIXME HACK to hot update version
+        cfg = Mix.ProjectStack.pop |> update_in([:config, :version], fn _ -> "0.0.11" end)
+        Mix.ProjectStack.push cfg[:name], cfg[:config], cfg[:file]
+        # ⇑ FIXME HACK to update version
+
         {:ok, version}
     end
   end

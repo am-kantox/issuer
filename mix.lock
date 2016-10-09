@@ -4,7 +4,7 @@
   "earmark": {:hex, :earmark, "1.0.1", "2c2cd903bfdc3de3f189bd9a8d4569a075b88a8981ded9a0d95672f6e2b63141", [:mix], []},
   "egithub": {:hex, :egithub, "0.2.9", "45e939731a5172cfa1c27145930fed0046f7b264b382376154525fd01ccae8be", [:"erlang.mk", :rebar], [{:hackney, "1.6.0", [hex: :hackney, optional: false]}, {:jiffy, "0.14.7", [hex: :jiffy, optional: false]}, {:lager, "3.2.1", [hex: :lager, optional: false]}]},
   "elixir_make": {:hex, :elixir_make, "0.3.0", "285147fa943806eee82f6680b7b446b5569bcf3ee8328fa0a7c200ffc44fbaba", [:mix], []},
-  "ex_doc": {:hex, :ex_doc, "0.14.1", "bfed8d4e93c755e2b150be925ad2cfa6af7c3bfcacc3b609f45f6048c9d623d6", [:mix], [{:earmark, "~> 1.0", [hex: :earmark, optional: false]}]},
+  "ex_doc": {:hex, :ex_doc, "0.14.2", "c89d60db464e8a0849a35dbcd6eed71f2b076c339d0b05b3bb5c90d6bab31e4f", [:mix], [{:earmark, "~> 1.0", [hex: :earmark, optional: false]}]},
   "ex_ncurses": {:git, "https://github.com/jfreeze/ex_ncurses.git", "303954b2debec4b481302215017c6fbc3693772f", []},
   "exjsx": {:hex, :exjsx, "3.2.1", "1bc5bf1e4fd249104178f0885030bcd75a4526f4d2a1e976f4b428d347614f0f", [:mix], [{:jsx, "~> 2.8.0", [hex: :jsx, optional: false]}]},
   "goldrush": {:hex, :goldrush, "0.1.8", "2024ba375ceea47e27ea70e14d2c483b2d8610101b4e852ef7f89163cdb6e649", [:rebar3], []},
