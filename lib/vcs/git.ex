@@ -47,7 +47,7 @@ defmodule Issuer.Git do
     def commit!(data, message) do
       case System.cmd("git", ["commit", "-am", message]) do
         {_, 0} ->
-          System.cmd("git", "push")
+          System.cmd("git", ["push"])
           :ok
         other   -> {:error, other}
       end
