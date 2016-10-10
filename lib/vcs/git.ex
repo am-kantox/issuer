@@ -36,7 +36,7 @@ defmodule Issuer.Git do
     """
     def tag!(data, tag) do
       case {System.cmd("git", ["tag", tag]), System.cmd("git", ["push", "--tags"])} do
-        {{"", 0}, {"", 0}}  -> :ok
+        {{_, 0}, {_, 0}}  -> :ok
         other -> {:error, other}
       end
     end
@@ -46,7 +46,7 @@ defmodule Issuer.Git do
     """
     def commit!(data, message) do
       case System.cmd("git", ["commit", "-am", message]) do
-        {"", 0} ->
+        {_, 0} ->
           System.cmd("git", "push")
           :ok
         other   -> {:error, other}

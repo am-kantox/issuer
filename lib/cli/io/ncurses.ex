@@ -7,36 +7,41 @@ defmodule Issuer.CLI.IO.Ncurses do
   @chosen_one_no "◎"
   @chosen_one_yes "🔘" # ● ◉ ⬤ 🔘
 
-  # FIXME Currently we have to pass the title that fits on the line
-  #        to properly render a caption, which is ugly.
-  #       Need to calculate it!
-  def survey!(title, questions, row \\ 0) when is_list(questions) do
-    ExNcurses.n_begin()
-    refresh(false)
+  defstruct title: "Hello, please answer our survey:",
+            questions: []
 
-    IO.puts "\e[#{row};0H\e[#{@title_color};1m#{title}\e[0m\n"
-    {results, _} = questions |> Enum.map_reduce(row + 3, fn {title, choices, chosen, position}, acc ->
-      # FIXME store the whole screen text in the string array and print everything
-      rows = ExNcurses.lines()
-      choice_size = size(choices) + 2
-      left = (acc + choice_size) - rows
-      if left > 0, do: (1..left) |> Enum.each(fn _ -> IO.puts("\e[#{rows};0H") end) # scroll it
-      acc = Enum.min [acc, ExNcurses.lines() - choice_size]
-      {ask(acc, {title, choices, chosen, position}), acc + choice_size}
-    end)
-    refresh(true)
-    ExNcurses.clear()
-    ExNcurses.n_end()
+  defimpl Issuer.Survey, for: Issuer.CLI.IO.Ncurses do
+    # FIXME Currently we have to pass the title that fits on the line
+    #        to properly render a caption, which is ugly.
+    #       Need to calculate it!
+    def survey!(data, row \\ 0) do
+      ExNcurses.n_begin()
+      Issuer.CLI.IO.Ncurses.refresh(false)
 
-    results
+      IO.puts "\e[#{row};0H\e[#{@title_color};1m#{data.title}\e[0m\n"
+      {results, _} = data.questions |> Enum.map_reduce(row + 3, fn {title, choices, chosen, position}, acc ->
+        # FIXME store the whole screen text in the string array and print everything
+        rows = ExNcurses.lines()
+        choice_size = Issuer.CLI.IO.Ncurses.size(choices) + 2
+        left = (acc + choice_size) - rows
+        if left > 0, do: (1..left) |> Enum.each(fn _ -> IO.puts("\e[#{rows};0H") end) # scroll it
+        acc = Enum.min [acc, ExNcurses.lines() - choice_size]
+        {Issuer.CLI.IO.Ncurses.ask(acc, {title, choices, chosen, position}), acc + choice_size}
+      end)
+      Issuer.CLI.IO.Ncurses.refresh(true)
+      ExNcurses.clear()
+      ExNcurses.n_end()
+
+      results
+    end
   end
 
   ##############################################################################
 
-  defp ask(row, questionnaire, final \\ false)
+  def ask(row, questionnaire, final \\ false)
 
-  # multi choice
-  defp ask(row, {title, choices, _chosen, position}, final) when is_binary(choices) do
+  # input
+  def ask(row, {title, choices, _chosen, position}, final) when is_binary(choices) do
     refresh(false)
 
     IO.puts "\e[#{row};0H\e[#{@title_color}m#{title}\e[0m"
@@ -66,7 +71,7 @@ defmodule Issuer.CLI.IO.Ncurses do
   end
 
   # multi choice
-  defp ask(row, {title, choices, chosen, position}, final) when is_list(choices) and is_list(chosen) do
+  def ask(row, {title, choices, chosen, position}, final) when is_list(choices) and is_list(chosen) do
     refresh(false)
 
     IO.puts "\e[#{row};0H\e[#{@title_color}m#{title}\e[0m"
@@ -101,7 +106,7 @@ defmodule Issuer.CLI.IO.Ncurses do
   end
 
   # single choice
-  defp ask(row, {title, choices, chosen, position}, final) when is_list(choices) and is_integer(chosen) do
+  def ask(row, {title, choices, chosen, position}, final) when is_list(choices) and is_integer(chosen) do
     refresh(false)
 
     IO.puts "\e[#{row};0H\e[#{@title_color}m#{title}\e[0m"
@@ -131,7 +136,7 @@ defmodule Issuer.CLI.IO.Ncurses do
 
   ##############################################################################
 
-  defp refresh(clear?) do
+  def refresh(clear?) do
     ExNcurses.mvprintw(0, 0, "")
     ExNcurses.refresh()
     if clear?, do: ExNcurses.clear()
@@ -149,8 +154,8 @@ defmodule Issuer.CLI.IO.Ncurses do
   defp checkbox(false, _), do: "\e[0m#{@chosen_many_no} "
   defp checkbox(true, final), do: "\e[#{prefix(final)}m#{@chosen_many_yes} "
 
-  defp size(choices) when is_list(choices), do: Enum.count(choices)
-  defp size(choices) when is_binary(choices), do: 1
+  def size(choices) when is_list(choices), do: Enum.count(choices)
+  def size(choices) when is_binary(choices), do: 1
 
   defp delete_last_grapheme(string) do
     len = String.length(string)

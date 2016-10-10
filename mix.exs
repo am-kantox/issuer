@@ -30,7 +30,7 @@ defmodule Issuer.Mixfile do
   defp deps do
     [
       {:bunt, "~> 0.1"},
-      {:ex_ncurses, git: "https://github.com/jfreeze/ex_ncurses.git", only: :dev},
+      {:ex_ncurses, git: "https://github.com/jfreeze/ex_ncurses.git", only: [:dev, :test]},
 
       {:credo, "~> 0.4", only: [:dev]},
       {:ex_doc, "~> 0.11", only: :dev}

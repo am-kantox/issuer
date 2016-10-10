@@ -79,6 +79,17 @@ defmodule Mix.Tasks.Issuer do
     step("README", fun, callback, argv)
   end
 
+  def commit!(argv) do
+    # FIXME NOT HARDCODE GIT
+    fun = fn _ ->
+      {:ok, version} = Issuer.Utils.version?
+      %Issuer.Git{} |> Issuer.Vcs.commit!(":paperclip: Bump to version #{version}.")
+      %Issuer.Git{} |> Issuer.Vcs.tag!(version |> Issuer.Utils.prefix_version)
+    end
+    callback = fn result -> ["Unknown error: ", inspect(result)] end
+    step("committing changes", fun, callback, argv)
+  end
+
   def status!(argv) do
     # FIXME NOT HARDCODE GIT
     fun = fn _ -> %Issuer.Git{} |> Issuer.Vcs.status end
@@ -89,17 +100,6 @@ defmodule Mix.Tasks.Issuer do
       end
     end
     step("git status", fun, callback, argv)
-  end
-
-  def commit!(argv) do
-    # FIXME NOT HARDCODE GIT
-    fun = fn _ ->
-      {:ok, version} = Issuer.Utils.version?
-      %Issuer.Git{} |> Issuer.Vcs.commit!(":paperclip: Bump to version #{version}.")
-      %Issuer.Git{} |> Issuer.Vcs.tag!(version |> Issuer.Utils.prefix_version)
-    end
-    callback = fn result -> ["Unknown error: ", inspect(result)] end
-    step("committing changes", fun, callback, argv)
   end
 
   def hex!(argv) do

@@ -4,18 +4,28 @@ if System.get_env("ISSUER_INTERACTIVE_TEST") == "true" do
     use ExUnit.Case
     require Logger
     import ExUnit.CaptureLog
-    doctest Issuer.CLI.Question.YesNo
 
-    alias Issuer.CLI.IO.Ncurses
+    alias Issuer.CLI.Question
 
-    test "ask for different answers" do
+    test "ask for different answers (ncurses)" do
+      %Issuer.CLI.IO.Ncurses{title: "Hello, please answer our survey:", questions: questions()}
+        |> Issuer.Survey.survey!
+    end
+
+    test "ask for different answers (plain gets)" do
+      %Issuer.CLI.IO.Gets{title: "Hello, please answer our survey:", questions: questions()}
+        |> Issuer.Survey.survey!
+    end
+
+    ############################################################################
+
+    defp questions do
       q = [
-        %Issuer.CLI.Question.Variant{} |> Issuer.CLI.Question.to_question,
-        %Issuer.CLI.Question.Variants{} |> Issuer.CLI.Question.to_question,
-        %Issuer.CLI.Question.Input{} |> Issuer.CLI.Question.to_question
+        %Question.Variant{} |> Question.to_question,
+        %Question.Variants{} |> Question.to_question,
+        %Question.Input{} |> Question.to_question
       ]
-      questions = (for i <- 1..2, do: q) |> Enum.flat_map(fn e -> e end) |> Enum.shuffle
-      Ncurses.survey! "Hello, please answer our survey:", questions
+      (for i <- 1..2, do: q) |> Enum.flat_map(&(&1)) |> Enum.shuffle
     end
   end
 
