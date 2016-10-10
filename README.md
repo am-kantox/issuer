@@ -34,6 +34,9 @@ than modifying `mix.exs` on each subsequent run.
 **Q:** Is it of any good?
 **A:** Yes, it is.
 
+**Q:** Is `issuer` itself being published with `issuer`?
+**A:** Indeed.
+
 **Q:** Won’t it ruin my project?
 **A:** Well, it could, but you have the project source versioned, haven’t you?
 
