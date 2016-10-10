@@ -3,7 +3,6 @@ defmodule Mix.Tasks.Issuer do
   @moduledoc @shortdoc
 
   use Mix.Task
-  alias Issuer.CLI.IO.Ncurses, as: CLI
 
   @doc false
   def run(argv) do
@@ -51,7 +50,13 @@ defmodule Mix.Tasks.Issuer do
           choice: 0,
         } |> Issuer.CLI.Question.to_question
       ]
-      [index] = CLI.survey! "I need some more information.", questions
+      title = "I need some more information."
+      survey_base = if Code.ensure_loaded?(ExNcurses) do
+                      %Issuer.CLI.IO.Ncurses{title: title, questions: questions}
+                    else
+                      %Issuer.CLI.IO.Gets{title: title, questions: questions}
+                    end
+      [index] = survey_base |> Issuer.Survey.survey!
       case Issuer.Utils.version!(tags |> Enum.at(index)) do
         {:ok, version} -> :ok
         other -> other
