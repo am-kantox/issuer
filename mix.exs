@@ -49,7 +49,7 @@ defmodule Issuer.Mixfile do
      files: ["lib", "config", "mix.exs", "README*"],
      maintainers: ["Aleksei Matiushkin"],
      licenses: ["MIT"],
-     links: %{"GitHub" => "https://github.com/mudasobwa/issuer",
-              "Docs" => "http://mudasobwa.github.io/issuer/"}]
+     links: %{"GitHub" => "https://github.com/am-kantox/issuer",
+              "Docs" => "https://hexdocs.pm/issuer"}]
   end
 end

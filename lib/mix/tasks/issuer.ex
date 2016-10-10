@@ -72,9 +72,9 @@ defmodule Mix.Tasks.Issuer do
         {:ok, version} ->
           # [{:issuer, "~> 0.1.0"}]
           File.write!("README.md", Regex.replace(
-            ~r|{\s*#{inspect(Mix.Project.config[:app])},\s*"~>[^"]+"}|,
+            ~r|{\s*#{inspect(Mix.Project.config[:app])},\s*"~>[^"]+"|,
             File.read!("README.md"),
-            ~s|{#{inspect(Mix.Project.config[:app])}, "~> #{version}"}|
+            ~s|{#{inspect(Mix.Project.config[:app])}, "~> #{version}"|
           ))
           :ok
         other -> other
