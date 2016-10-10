@@ -46,6 +46,8 @@ defmodule Issuer.Utils do
   - `"v1.3.3"`
   - `"v1.4.0-rc.1"`
 
+  The function will filter out all the existing tags to these:
+
       iex> Issuer.Utils.leaves([]) |> Enum.count
       1
 
