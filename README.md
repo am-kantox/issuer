@@ -1,5 +1,7 @@
 # Issuer
 
+[![Build Status](https://travis-ci.org/am-kantox/issuer.svg?branch=master)](https://travis-ci.org/am-kantox/issuer)
+
 ```elixir
 {:ok, app |> version_bump |> git_tag_commit_push |> hex publish} = `mix issuer`
 ```
@@ -10,7 +12,7 @@ Add `issuer` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-  [{:issuer, "~> 0.0.26", only: :dev}]
+  [{:issuer, "~> 0.1.0", only: :dev}]
 end
 ```
 
