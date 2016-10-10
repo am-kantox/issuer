@@ -45,8 +45,10 @@ defmodule Issuer.Git do
       Commits to the repo.
     """
     def commit!(data, message) do
-      case System.cmd("git", ["commit", "-am", "message"]) do
-        {"", 0} -> :ok
+      case System.cmd("git", ["commit", "-am", message]) do
+        {"", 0} ->
+          System.cmd("git", "push")
+          :ok
         other   -> {:error, other}
       end
     end

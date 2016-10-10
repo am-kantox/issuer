@@ -24,7 +24,7 @@ defmodule Mix.Tasks.Issuer do
   end
 
   defp everything!(argv) do
-    [:tests!, :readme!, :commit!, :status!, :hex!]
+    [:tests!, :survey!, :readme!, :commit!, :status!, :hex!]
       |> Enum.all?(fn f -> apply(Mix.Tasks.Issuer, f, [argv]) end)
   end
 
@@ -38,6 +38,29 @@ defmodule Mix.Tasks.Issuer do
     Mix.env(mix_env)
   end
 
+  def survey!(argv) do
+    fun = fn _ ->
+      tags = %Issuer.Git{}
+               |> Issuer.Vcs.tags
+               |> Enum.filter(&Issuer.Utils.version_valid?/1)
+               |> Issuer.Utils.sprouts
+      questions = [
+        %Issuer.CLI.Question.Variant{
+          title: "Please select a version you want to bump to",
+          choices: tags,
+          choice: 0,
+        } |> Issuer.CLI.Question.to_question
+      ]
+      [index] = CLI.survey! "I need some more information.", questions
+      case Issuer.Utils.version!(tags |> Enum.at(index)) do
+        {:ok, version} -> :ok
+        other -> other
+      end
+    end
+    callback = fn result -> ["Invalid version: ", inspect(result)] end
+    step("resetting version", fun, callback, argv)
+  end
+
   def readme!(argv) do
     fun = fn argv ->
       case Issuer.Utils.version? do
@@ -49,11 +72,10 @@ defmodule Mix.Tasks.Issuer do
             ~s|{#{inspect(Mix.Project.config[:app])}, "~> #{version}"}|
           ))
           :ok
-        other -> ["Fail to update README: ", inspect(other)]
+        other -> other
       end
     end
-    callback = fn result -> "Failed tests count: #{result |> Enum.count}." end
-
+    callback = fn result -> ["Fail to update README: ", inspect(result)] end
     step("README", fun, callback, argv)
   end
 
@@ -72,25 +94,8 @@ defmodule Mix.Tasks.Issuer do
   def commit!(argv) do
     # FIXME NOT HARDCODE GIT
     fun = fn _ ->
-      tags = %Issuer.Git{}
-               |> Issuer.Vcs.tags
-               |> Enum.filter(&Issuer.Utils.version_valid?/1)
-               |> Issuer.Utils.sprouts
-      questions = [
-        %Issuer.CLI.Question.Variant{
-          title: "Please select a version you want to bump to",
-          choices: tags,
-          choice: 0,
-        } |> Issuer.CLI.Question.to_question,
-        %Issuer.CLI.Question.Input{
-          title: "Please specify a commit message",
-          suggestion: "Bump version."
-        } |> Issuer.CLI.Question.to_question,
-      ]
-      [index, message] = CLI.survey! "I need some more information.", questions
-      version = tags |> Enum.at(index)
-      Issuer.Utils.version!(version)
-      %Issuer.Git{} |> Issuer.Vcs.commit!(message)
+      {:ok, version} = Issuer.Utils.version?
+      %Issuer.Git{} |> Issuer.Vcs.commit!(":paperclip: Bump to version #{version}.")
       %Issuer.Git{} |> Issuer.Vcs.tag!(version |> Issuer.Utils.prefix_version)
     end
     callback = fn result -> ["Unknown error: ", inspect(result)] end
