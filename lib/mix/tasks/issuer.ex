@@ -7,8 +7,13 @@ defmodule Mix.Tasks.Issuer do
   @doc false
   def run(argv) do
     case prerequisites?() do
-      {:fail, :version} -> Mix.Tasks.Issuer.Version.run(argv)
-      :ok               -> everything!(argv)
+      {:fail, :version} ->
+        case Mix.Tasks.Issuer.Version.run(argv) do
+          {:ok, _} -> run(argv)
+          {:error, version} -> Mix.raise("Please fix manually: #{version}")
+        end
+      :ok ->
+        everything!(argv)
     end
 
   end

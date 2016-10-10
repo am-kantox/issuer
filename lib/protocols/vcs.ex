@@ -18,4 +18,9 @@ defprotocol Issuer.Vcs do
   #   Performs commit.
   # """
   def commit!(data, message)
+
+  # @doc """
+  #   Adds a file to the following commit.
+  # """
+  def add!(data, file)
 end

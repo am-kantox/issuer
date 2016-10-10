@@ -41,6 +41,16 @@ defmodule Issuer.Git do
       end
     end
 
+    # @doc """
+    #   Adds a file to the following commit.
+    # """
+    def add!(data, file) do
+      case System.cmd("git", ["add", file]) do
+        {"", 0}  -> :ok
+        other -> {:error, other}
+      end
+    end
+
     @doc """
       Commits to the repo.
     """

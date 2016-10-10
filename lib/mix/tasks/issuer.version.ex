@@ -10,16 +10,17 @@ defmodule Mix.Tasks.Issuer.Version do
       [] -> case Issuer.Utils.version? do
               {:version!, version} ->
                 flagged(true,  "Misconfiguration detected: version was not found. `VERSION` file was written.")
-                version
+                {:error, version}
               {:mix!, version} ->
-                flagged(false, "Version updated in both `mix.exs` and `VERSION` files")
-                version
-              {:ok, version} -> version
+                flagged(false, "Version updated in both `mix.exs` and `VERSION` files. `VERSION` is scheduled for CVS add.")
+                %Issuer.Git{} |> Issuer.Vcs.add!(Path.join("config", "VERSION"))
+                {:ok, version}
+              {:ok, version} -> {:ok, version}
             end
-            :ok
       [version] when is_binary(version) ->
         {_, version} = Issuer.Utils.version?(version)
         Issuer.Utils.version!(version)
+        run(opts)
     end
   end
 
