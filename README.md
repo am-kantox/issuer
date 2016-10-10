@@ -10,7 +10,7 @@ Add `issuer` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-  [{:issuer, "~> 0.0.25", only: :dev}]
+  [{:issuer, "~> 0.0.26", only: :dev}]
 end
 ```
 
