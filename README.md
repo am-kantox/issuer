@@ -67,3 +67,7 @@ to your project’s `mix.exs` to be asked about version in fancy `ncurses`-based
 ## Docs
 
 [https://hexdocs.pm/issuer](https://hexdocs.pm/issuer)
+
+## License
+
+**MIT**
