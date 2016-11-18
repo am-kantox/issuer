@@ -8,7 +8,37 @@
 
 ## Installation
 
+**TODO:** http://elixir-lang.org/docs/stable/mix/Mix.Project.html#in_project/4
+
+```
+iex> :code.all_loaded |> Enum.each(fn(t) -> if Regex.match?(~r|Mixfile|, Atom.to_string(elem(t, 0))), do: IO.inspect(t) end)
+{ExNcurses.Mixfile, :in_memory}
+{Issuer.Mixfile, :in_memory}
+:ok
+
+iex> :ets.match(:ac_tab, {{:loaded, :"$1"}, :_})
+[[:iex], [:stdlib], [:bunt], [:ssl], [:compiler], [:asn1], [:hex], [:elixir],
+ [:crypto], [:public_key], [:inets], [:issuer], [:logger], [:kernel], [:mix]]
+
+iex> {:ok, list} = :application.get_key(:issuer, :modules)
+{:ok,
+ [Issuer, Issuer.CLI.IO.Gets, Issuer.CLI.IO.Ncurses, Issuer.CLI.Question,
+  Issuer.CLI.Question.Input, Issuer.CLI.Question.Issuer.CLI.Question.Input,
+  Issuer.CLI.Question.Issuer.CLI.Question.Variant,
+  Issuer.CLI.Question.Issuer.CLI.Question.Variants,
+  Issuer.CLI.Question.Issuer.CLI.Question.YesNo, Issuer.CLI.Question.Variant,
+  Issuer.CLI.Question.Variants, Issuer.CLI.Question.YesNo, Issuer.Git,
+  Issuer.Survey, Issuer.Survey.Issuer.CLI.IO.Gets,
+  Issuer.Survey.Issuer.CLI.IO.Ncurses, Issuer.Utils, Issuer.Vcs,
+  Issuer.Vcs.Issuer.Git, Mix.Tasks.Issuer, Mix.Tasks.Issuer.Version]}
+
+iex> list |> Enum.map(fn mod -> {mod, mod.__info__(:functions) |> Enum.filter(fn {k, v} -> not String.starts_with?(Atom.to_string(k), "__") end)} end)
+
+
+```
+
 Add `issuer` to your list of dependencies in `mix.exs`:
+
 
 ```elixir
 def deps do

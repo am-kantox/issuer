@@ -1,6 +1,7 @@
 defmodule Issuer.Utils do
 
   @version_file Path.join("config", "VERSION")
+  @interfaces_dir Path.join("config", "interfaces")
   @mix_file "mix.exs"
   @re ~r|version:\s*"([-.\w]+)"|
   @proper_mix_version ~S|version: File.read!(Path.join("config", "VERSION"))|
@@ -87,6 +88,64 @@ defmodule Issuer.Utils do
 
   ##############################################################################
 
+  def interface_changes(v1, v2) do
+    neu = Path.join(@interfaces_dir, v1)
+    old = Path.join(@interfaces_dir, v2)
+  end
+
+  @doc """
+
+  ## Examples
+
+      iex> with {name, _} <- Issuer.Utils.functions! |> List.last, do: name
+      :"Mix.Tasks.Issuer.Version#run/1"
+  """
+  def functions! do
+    unless loaded?(), do: Mix.raise("Project structure is not loaded, aborting. Please revise manually.")
+
+    modules!()
+    |> Enum.reduce([], fn mod, acc -> acc |> Keyword.merge(docs(mod)) end)
+    # |> Enum.sort_by(fn {k, _} -> k end)
+  end
+
+  @doc """
+
+  ## Examples
+
+      iex> Issuer.Utils.modules! |> List.last
+      Mix.Tasks.Issuer.Version
+  """
+  def modules!, do: with {:ok, list} <- modules(), do: list, else: []
+
+  defp project do
+    Mix.Project.get
+    |> Module.split
+    |> List.first
+    |> String.downcase
+    |> String.to_atom
+  end
+
+  defp loaded, do: :ets.match(:ac_tab, {{:loaded, :"$1"}, :_})
+
+  defp loaded?(project \\ [project()]), do: loaded() |> Enum.find(& &1 == project)
+
+  defp modules, do: :application.get_key(project(), :modules)
+
+  defp docs(module) do
+    module_name = "#{module}"
+                  |> String.trim_leading("Elixir.")
+    module
+    |> Code.get_docs(:docs) # {{:commit!, 1}, 92, :def, [{:argv, [], nil}], nil}
+    |> Enum.filter(fn {{name, _}, _, _, _, _} ->
+         not (name |> Atom.to_string |> String.starts_with?("__"))
+       end)
+    |> Enum.reduce([], fn {{name, arity}, line, _kw, _args, doc}, acc ->
+         acc |> put_in(["#{module_name}##{name}/#{arity}" |> String.to_atom], {line, doc})
+       end)
+  end
+
+  ##############################################################################
+
   def version!(v) when is_binary(v) do
     case version_valid?(v) do
       false -> {:invalid, v}
@@ -122,6 +181,8 @@ defmodule Issuer.Utils do
     end
   end
 
+  ##############################################################################
+
   def prefix_version(v) when is_binary(v) do
     prefix_version(version(v))
   end
@@ -146,6 +207,8 @@ defmodule Issuer.Utils do
       MatchError -> false
     end
   end
+
+  ##############################################################################
 
   def version_in_mix?(_ \\ false)
   def version_in_mix?(false) do
