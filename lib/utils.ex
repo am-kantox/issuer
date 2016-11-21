@@ -92,7 +92,7 @@ defmodule Issuer.Utils do
     case File.read(@interfaces_file) do
       {:error, :enoent} -> {:not_found, {:+, neu}, {:-, []}}
       {:ok, legacy} ->
-        legacy = legacy |> Code.eval_string
+        {legacy, _} = legacy |> Code.eval_string
         {:found, {:+, subtract_keywords(neu, legacy)}, {:-, subtract_keywords(legacy, neu)}}
     end
   end
