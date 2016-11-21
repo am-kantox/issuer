@@ -28,7 +28,7 @@ defmodule Mix.Tasks.Issuer do
   end
 
   defp everything!(argv) do
-    [:tests!, :check_interface!, :survey!, :readme!, :commit!, :status!, :hex!]
+    [:tests!, :check_interface!, :survey!, :readme!, :interfaces!, :commit!, :status!, :hex!]
       |> Enum.all?(fn f -> apply(Mix.Tasks.Issuer, f, [argv]) end)
   end
 
@@ -50,11 +50,11 @@ defmodule Mix.Tasks.Issuer do
           Bunt.puts [:bright, "⇒", :reset, " Previous version is #{what}…"]
           unless Enum.empty?(added), do: Bunt.puts [:bright, "⇒", :reset, " Added interfaces:"]
           added |> Enum.each(fn {k, {_, doc}} ->
-            Bunt.puts(["  ", :green, "✓", :reset, " “", Atom.to_string(k), "” (", doc || "[not documented]", ")."])
+            Bunt.puts(["  ", :green, "✓", :reset, " “", Atom.to_string(k), "” (", format_doc(doc), ")."])
           end)
           unless Enum.empty?(dropped), do: Bunt.puts [:bright, "⇒", :reset, " Removed interfaces:"]
           dropped |> Enum.each(fn {k, {_, doc}} ->
-            Bunt.puts(["  ", :red, "✗", :reset, " “", Atom.to_string(k), "” (", doc || "[not documented]", ")."])
+            Bunt.puts(["  ", :red, "✗", :reset, " “", Atom.to_string(k), "” (", format_doc(doc), ")."])
           end)
           :ok
       end
@@ -76,11 +76,13 @@ defmodule Mix.Tasks.Issuer do
         } |> Issuer.CLI.Question.to_question
       ]
       title = "I need some more information."
-      survey_base = if Code.ensure_loaded?(ExNcurses) do
-                      %Issuer.CLI.IO.Ncurses{title: title, questions: questions}
-                    else
-                      %Issuer.CLI.IO.Gets{title: title, questions: questions}
-                    end
+      # survey_base = if Code.ensure_loaded?(ExNcurses) do
+      #                 %Issuer.CLI.IO.Ncurses{title: title, questions: questions}
+      #               else
+      #                 %Issuer.CLI.IO.Gets{title: title, questions: questions}
+      #               end
+      survey_base = %Issuer.CLI.IO.Gets{title: title, questions: questions}
+
       [index] = survey_base |> Issuer.Survey.survey!
       case Issuer.Utils.version!(tags |> Enum.at(index)) do
         {:ok, version} -> :ok
@@ -89,6 +91,14 @@ defmodule Mix.Tasks.Issuer do
     end
     callback = fn result -> ["Invalid version: ", inspect(result)] end
     step("resetting version", fun, callback, argv)
+  end
+
+  def interfaces!(argv) do
+    fun = fn argv ->
+      Issuer.Utils.interface_changes!
+      :ok
+    end
+    step("INTERFACES", fun, nil, argv)
   end
 
   def readme!(argv) do
@@ -165,6 +175,17 @@ defmodule Mix.Tasks.Issuer do
         Bunt.puts(message ++ addendum)
         IO.puts @super
         false
+    end
+  end
+
+  defp format_doc(doc) do
+    case doc do
+      str when is_binary(str) ->
+        doc
+        |> String.split(~r/\.|\n/, parts: 2, trim: true)
+        |> List.first
+        |> String.trim
+      _ -> "[not documented]"
     end
   end
 end
