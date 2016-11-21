@@ -10,6 +10,8 @@
 
 **TODO:** http://elixir-lang.org/docs/stable/mix/Mix.Project.html#in_project/4
 
+**NB:** Starting with version `0.2` we store the interfaces in file `config/INTERFACES` to compare against current version and suggest whether minor version might be updated, or interfaces were changed drastically. Just add this file to your git repo to avoid “Unstaged changes:\n?? config/INTERFACES” error on git check.
+
 Add `issuer` to your list of dependencies in `mix.exs`:
 
 ```elixir
