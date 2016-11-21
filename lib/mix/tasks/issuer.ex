@@ -28,7 +28,7 @@ defmodule Mix.Tasks.Issuer do
   end
 
   defp everything!(argv) do
-    [:tests!, :survey!, :readme!, :commit!, :status!, :hex!]
+    [:tests!, :check_interface!, :survey!, :readme!, :commit!, :status!, :hex!]
       |> Enum.all?(fn f -> apply(Mix.Tasks.Issuer, f, [argv]) end)
   end
 
@@ -40,6 +40,26 @@ defmodule Mix.Tasks.Issuer do
     Mix.env(:test)
     step("tests", fun, callback, argv)
     Mix.env(mix_env)
+  end
+
+  def check_interface!(argv) do
+    # ["Issuer.Utils#sprouts/1": {9, "Returns “sprouts” for VCS tags. Those ..."}, ...]
+    fun = fn argv ->
+      case Issuer.Utils.interface_changes? do
+        {what, {:+, added}, {:-, dropped}} ->
+          Bunt.puts [:bright, "⇒", :reset, " Previous version is #{what}…"]
+          unless Enum.empty?(added), do: Bunt.puts [:bright, "⇒", :reset, " Added interfaces:"]
+          added |> Enum.each(fn {k, {_, doc}} ->
+            Bunt.puts(["  ", :green, "✓", :reset, " “", Atom.to_string(k), "” (", doc || "[not documented]", ")."])
+          end)
+          unless Enum.empty?(dropped), do: Bunt.puts [:bright, "⇒", :reset, " Removed interfaces:"]
+          dropped |> Enum.each(fn {k, {_, doc}} ->
+            Bunt.puts(["  ", :red, "✗", :reset, " “", Atom.to_string(k), "” (", doc || "[not documented]", ")."])
+          end)
+          :ok
+      end
+    end
+    step("Interface changes", fun, nil, argv)
   end
 
   def survey!(argv) do

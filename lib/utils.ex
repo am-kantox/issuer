@@ -1,7 +1,7 @@
 defmodule Issuer.Utils do
 
   @version_file Path.join("config", "VERSION")
-  @interfaces_dir Path.join("config", "interfaces")
+  @interfaces_file Path.join("config", "INTERFACES")
   @mix_file "mix.exs"
   @re ~r|version:\s*"([-.\w]+)"|
   @proper_mix_version ~S|version: File.read!(Path.join("config", "VERSION"))|
@@ -88,9 +88,23 @@ defmodule Issuer.Utils do
 
   ##############################################################################
 
-  def interface_changes(v1, v2) do
-    neu = Path.join(@interfaces_dir, v1)
-    old = Path.join(@interfaces_dir, v2)
+  def interface_changes?(neu \\ Issuer.Utils.functions!) do
+    case File.read(@interfaces_file) do
+      {:error, :enoent} -> {:not_found, {:+, neu}, {:-, []}}
+      {:ok, legacy} ->
+        legacy = legacy |> Code.eval_string
+        {:found, {:+, subtract_keywords(neu, legacy)}, {:-, subtract_keywords(legacy, neu)}}
+    end
+  end
+  def interface_changes! do
+    neu = Issuer.Utils.functions!
+    result = neu |> interface_changes?
+    File.write(@interfaces_file, inspect(neu))
+    result
+  end
+
+  defp subtract_keywords(l1, l2) do
+    l1 |> Keyword.drop(l2 |> Keyword.keys)
   end
 
   @doc """
