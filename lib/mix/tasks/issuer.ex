@@ -75,7 +75,7 @@ defmodule Mix.Tasks.Issuer do
           choice: 0,
         } |> Issuer.CLI.Question.to_question
       ]
-      title = "I need some more information."
+      title = "I need more information."
       # survey_base = if Code.ensure_loaded?(ExNcurses) do
       #                 %Issuer.CLI.IO.Ncurses{title: title, questions: questions}
       #               else

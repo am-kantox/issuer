@@ -99,7 +99,7 @@ defmodule Issuer.Utils do
   def interface_changes! do
     neu = Issuer.Utils.functions!
     result = neu |> interface_changes?
-    File.write(@interfaces_file, inspect(neu))
+    File.write(@interfaces_file, Macro.to_string(neu))
     result
   end
 
